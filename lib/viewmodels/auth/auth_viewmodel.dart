@@ -39,7 +39,7 @@ class AuthViewModel {
   }
 
   Future signOut(BuildContext context) async {
-    await _sharedPrefsManager.saveData(_sharedPrefsManager.isLogin, null);
+    await _sharedPrefsManager.saveData(_sharedPrefsManager.isLogin, false);
     if (context.mounted) {
       StoreProvider.of<ProductState>(context).dispatch(ProductActionClear());
       Navigator.of(context).pushReplacement(
