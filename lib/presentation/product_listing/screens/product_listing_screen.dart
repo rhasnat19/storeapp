@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storeapp/presentation/product_listing/widget/widget.dart';
 import 'package:storeapp/redux/product_redux.dart/product_state.dart';
 import 'package:storeapp/utils/di/di.dart';
+import 'package:storeapp/viewmodels/auth/auth.dart';
 import 'package:storeapp/viewmodels/product/product_viewmodel.dart';
 
 class ProductListingScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class ProductListingScreen extends StatefulWidget {
 
 class _ProductListingScreenState extends State<ProductListingScreen> {
   var productViewModel = getIt<ProductViewModel>();
+  var authViewModel = getIt<AuthViewModel>();
   int pageNo = 1;
   ScrollController _scrollController = ScrollController();
   @override
@@ -39,74 +41,91 @@ class _ProductListingScreenState extends State<ProductListingScreen> {
               .then((value) => setState(() => pageNo++));
         },
         builder: (context, state) {
-          return Scaffold(
-            body: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const ClampingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const SizedBox(height: 60),
-                    const Text(
-                      "Products",
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (!(state.isProductFetching ?? false)) ...[
-                      const SizedBox(height: 20),
-                      if ((state.products?.length ?? 0) > 0)
-                        ListView.separated(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.products?.length ?? 0,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () => productViewModel.getProductDetail(
-                                context,
-                                state.products?[index].id ?? 1,
-                              ),
-                              child: ProductItem(
-                                product: state.products?[index],
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 10),
-                        )
-                      else
-                        const Center(
-                          child: Text("No Item Found"),
-                        ),
-                      if (state.isPaginationLoad ?? false) ...[
-                        const SizedBox(height: 20),
-                        const Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CircularProgressIndicator.adaptive(),
-                              Text("Loading...")
-                            ],
+          return WillPopScope(
+            onWillPop: () async {
+              return false;
+            },
+            child: Scaffold(
+              body: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      const SizedBox(height: 60),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Products",
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                          TextButton(
+                            onPressed: () async =>
+                                await authViewModel.signOut(context),
+                            child: const Text(
+                              "Logout",
+                            ),
+                          )
+                        ],
+                      ),
+                      if (!(state.isProductFetching ?? false)) ...[
                         const SizedBox(height: 20),
-                      ],
-                      const SizedBox(height: 40)
-                    ] else
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height / 1.2,
-                        child: const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
-                      )
-                  ],
+                        if ((state.products?.length ?? 0) > 0)
+                          ListView.separated(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: state.products?.length ?? 0,
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onTap: () => productViewModel.getProductDetail(
+                                  context,
+                                  state.products?[index].id ?? 1,
+                                ),
+                                child: ProductItem(
+                                  product: state.products?[index],
+                                ),
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                          )
+                        else
+                          const Center(
+                            child: Text("No Item Found"),
+                          ),
+                        if (state.isPaginationLoad ?? false) ...[
+                          const SizedBox(height: 20),
+                          const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator.adaptive(),
+                                Text("  Loading...")
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                        const SizedBox(height: 40)
+                      ] else
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height / 1.2,
+                          child: const Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
+                        )
+                    ],
+                  ),
                 ),
               ),
             ),

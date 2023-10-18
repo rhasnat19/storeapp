@@ -30,7 +30,7 @@ class AuthViewModel {
       if (context.mounted) {
         StoreProvider.of<AuthState>(context)
             .dispatch(ActionClear(type: "clear auth model"));
-        Navigator.of(context).push(MaterialPageRoute(
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (BuildContext context) => const ProductListingScreen()));
       }
     } catch (e) {
@@ -38,13 +38,25 @@ class AuthViewModel {
     }
   }
 
+  Future signOut(BuildContext context) async {
+    await _sharedPrefsManager.saveData(_sharedPrefsManager.isLogin, null);
+    if (context.mounted) {
+      StoreProvider.of<ProductState>(context).dispatch(ProductActionClear());
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) => const AuthScreen(),
+        ),
+      );
+    }
+  }
+
   Future<void> isLogin(BuildContext context) async {
     bool? isLogin = _sharedPrefsManager.getData(_sharedPrefsManager.isLogin);
     if (isLogin ?? false) {
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (BuildContext context) => const ProductListingScreen()));
     } else {
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (BuildContext context) => const AuthScreen()));
     }
   }
