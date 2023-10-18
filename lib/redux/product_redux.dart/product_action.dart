@@ -17,3 +17,7 @@ class ProductActionUpdate {
     required this.type,
   });
 }
+
+class ProductActionClear {
+  ProductActionClear();
+}

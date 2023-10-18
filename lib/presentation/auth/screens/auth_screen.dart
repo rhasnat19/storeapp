@@ -42,6 +42,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       controller: emailController,
                       label: 'Email',
                       hintText: 'e.g. test@test.com',
+                      textInputType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
                       validator: AuthValidator.emailValidator,
                       // initialValue: state.authModel?.email ?? "",
                       inputFormatters: [LengthLimitingTextInputFormatter(150)],

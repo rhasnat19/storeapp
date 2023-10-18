@@ -23,6 +23,8 @@ ProductState productReducer(ProductState newState, dynamic action) {
     } else if (action.type == 'update pagination loader') {
       newState.isPaginationLoad = action.payloadData;
     }
+  } else if (action is ProductActionClear) {
+    newState = ProductState.initial();
   }
   return newState;
 }
